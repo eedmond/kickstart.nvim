@@ -91,7 +91,18 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
+
+vim.wo.relativenumber = true
+
+vim.opt.tabstop = 4
+vim.opt.tabstop = 4
+vim.opt.shiftwidth = 4
+vim.opt.expandtab = true
+
+vim.api.nvim_set_option('clipboard', 'unnamedplus')
+
+vim.lsp.enable 'sourcekit'
 
 -- [[ Setting options ]]
 require 'options'
