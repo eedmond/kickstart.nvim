@@ -102,8 +102,6 @@ vim.opt.expandtab = true
 
 vim.api.nvim_set_option('clipboard', 'unnamedplus')
 
-vim.lsp.enable 'sourcekit'
-
 -- [[ Setting options ]]
 require 'options'
 
