@@ -39,12 +39,12 @@ require('lualine').setup {
   },
   sections = {
     lualine_a = { { 'mode', separator = { left = '' }, right_padding = 2 } },
-    lualine_b = { { 'filename', path = 1 }, 'branch' },
+    lualine_b = { { 'filename', path = 1 } },
     lualine_c = {
       '%=', --[[ add your center components here in place of this comment ]]
     },
     lualine_x = {},
-    lualine_y = { 'filetype', 'progress' },
+    lualine_y = { 'branch', 'filetype', 'progress' },
     lualine_z = {
       { 'location', separator = { right = '' }, left_padding = 2 },
     },
