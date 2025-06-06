@@ -114,7 +114,7 @@ require 'lazy-bootstrap'
 -- [[ Configure and install plugins ]]
 require 'lazy-plugins'
 
-require 'catppuccin'
+require 'custom.plugins.catppuccin'
 vim.cmd.colorscheme 'catppuccin'
 
 require 'custom.plugins.lualine-themes.bubbles'
