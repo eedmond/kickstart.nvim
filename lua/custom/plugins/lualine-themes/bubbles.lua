@@ -10,6 +10,7 @@ local colors = {
   white  = '#cdd6f4',
   red    = '#f38ba8',
   violet = '#cba6f7',
+  yellow = '#f9e2af',
   grey   = '#45475a',
   green  = '#a6e3a1',
 }
@@ -23,7 +24,7 @@ local bubbles_theme = {
 
   command = { a = { fg = colors.black, bg = colors.green } },
   insert = { a = { fg = colors.black, bg = colors.blue } },
-  visual = { a = { fg = colors.black, bg = colors.cyan } },
+  visual = { a = { fg = colors.black, bg = colors.yellow } },
   replace = { a = { fg = colors.black, bg = colors.red } },
 
   inactive = {
