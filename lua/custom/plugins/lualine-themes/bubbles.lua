@@ -5,7 +5,7 @@
 -- stylua: ignore
 local colors = {
   blue   = '#89b4fa',
-  cyan   = '#74c7ec',
+  cyan   = '#94e2d5',
   black  = '#11111b',
   white  = '#cdd6f4',
   red    = '#f38ba8',
@@ -24,7 +24,7 @@ local bubbles_theme = {
 
   command = { a = { fg = colors.black, bg = colors.green } },
   insert = { a = { fg = colors.black, bg = colors.blue } },
-  visual = { a = { fg = colors.black, bg = colors.yellow } },
+  visual = { a = { fg = colors.black, bg = colors.cyan } },
   replace = { a = { fg = colors.black, bg = colors.red } },
 
   inactive = {
