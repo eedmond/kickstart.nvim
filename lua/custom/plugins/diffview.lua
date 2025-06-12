@@ -9,5 +9,8 @@ return {
         },
       },
     },
+    keys = {
+      { '<leader>hh', '<cmd>DiffviewFileHistory<CR>', desc = '[H]unk [H]istory' },
+    },
   },
 }
