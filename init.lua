@@ -117,8 +117,6 @@ require 'lazy-plugins'
 require 'custom.plugins.catppuccin'
 vim.cmd.colorscheme 'catppuccin'
 
-require 'custom.plugins.diffview'
-
 require 'custom.plugins.lualine-themes.bubbles'
 
 -- The line beneath this is called `modeline`. See `:help modeline`
