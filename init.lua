@@ -114,6 +114,8 @@ require 'lazy-bootstrap'
 -- [[ Configure and install plugins ]]
 require 'lazy-plugins'
 
+require 'diffview'
+
 require 'custom.plugins.catppuccin'
 vim.cmd.colorscheme 'catppuccin'
 
