@@ -28,19 +28,20 @@ return {
       }
 
       local colors = {
-        '#40a02b', -- Green
-        '#d20f39', -- Red
-        '#1e66f5', -- Blue
-        '#179299', -- Teal
-        '#fe640b', -- Peach
-        '#df8e1d', -- Yellow
-        '#8839ef', -- Mauve
-        '#40a02b', -- Green
-        '#ea76cb', -- Pink
-        '#acb0be', -- Surface 2
+        '#40a02b', -- 0 Green
+        '#d20f39', -- 1 Red
+        '#1e66f5', -- 2 Blue
+        '#179299', -- 3 Teal
+        '#fe640b', -- 4 Peach
+        '#df8e1d', -- 5 Yellow
+        '#8839ef', -- 6 Mauve
+        '#40a02b', -- 7 Green
+        '#ea76cb', -- 8 Pink
+        '#4c4f69', -- 9 Text
+        '#1e1e2d', -- 10 Base
       }
       vim.api.nvim_set_hl(0, 'DiffAdd', { fg = colors[0], bg = 'NONE' })
-      vim.api.nvim_set_hl(0, 'DiffDelete', { fg = colors[1], bg = 'NONE' })
+      vim.api.nvim_set_hl(0, 'DiffDelete', { fg = colors[9], bg = colors[10] })
       vim.api.nvim_set_hl(0, 'DiffChange', { fg = colors[2], bg = 'NONE' })
       vim.api.nvim_set_hl(0, 'DiffText', { fg = colors[3], bg = 'NONE' })
 
