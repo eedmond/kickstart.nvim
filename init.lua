@@ -116,6 +116,8 @@ require 'lazy-plugins'
 
 require 'custom.plugins.neotest'
 
+require 'diffview'
+
 require 'custom.plugins.catppuccin'
 vim.cmd.colorscheme 'catppuccin'
 
