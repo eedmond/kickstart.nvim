@@ -12,6 +12,7 @@ return {
     keys = {
       { '<leader>hh', '<cmd>DiffviewFileHistory %<CR>', desc = '[H]unk [H]istory' },
       { '<leader>ph', '<cmd>DiffviewFileHistory<CR>', desc = '[P]roject [H]istory' },
+      { '<leader>q', '<cmd>DiffviewClose<CR>', desc = 'Close Diffview' },
     },
     config = function(_, opts)
       vim.opt.fillchars = {

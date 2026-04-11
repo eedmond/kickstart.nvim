@@ -13,6 +13,7 @@ return {
   },
   {
     'wojciech-kulik/xcodebuild.nvim',
+    ft = 'swift',
     dependencies = {
       'nvim-telescope/telescope.nvim',
       'MunifTanjim/nui.nvim',
