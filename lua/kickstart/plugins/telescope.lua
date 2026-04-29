@@ -72,6 +72,13 @@ return {
             '--hidden',
             '--smart-case',
           },
+          mappings = {
+            i = {
+              ['<M-BS>'] = function()
+                vim.api.nvim_input '<C-w>'
+              end,
+            },
+          },
         },
         extensions = {
           ['ui-select'] = {
