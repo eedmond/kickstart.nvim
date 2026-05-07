@@ -8,6 +8,20 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 -- Marks
 vim.keymap.set('n', '<leader>ml', '<cmd>marks<CR>', { desc = '[M]arks [L]ist' })
 
+-- Toggle markdown checkbox on the current line: [ ] <-> [x]
+vim.keymap.set('n', '<leader>mx', function()
+  local line = vim.api.nvim_get_current_line()
+  local new_line, n = line:gsub('%[[xX]%]', '[ ]', 1)
+  if n == 0 then
+    new_line, n = line:gsub('%[ %]', '[x]', 1)
+  end
+  if n == 0 then
+    vim.notify('No markdown checkbox on this line', vim.log.levels.WARN)
+    return
+  end
+  vim.api.nvim_set_current_line(new_line)
+end, { desc = '[M]arkdown toggle checkbo[x]' })
+
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
