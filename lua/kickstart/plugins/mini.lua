@@ -12,10 +12,22 @@ return {
 
       -- Add/delete/replace surroundings (brackets, quotes, etc.)
       --
-      -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
-      -- - sd'   - [S]urround [D]elete [']quotes
-      -- - sr)'  - [S]urround [R]eplace [)] [']
-      require('mini.surround').setup()
+      -- - <leader>saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
+      -- - <leader>sd'   - [S]urround [D]elete [']quotes
+      -- - <leader>sr)'  - [S]urround [R]eplace [)] [']
+      require('mini.surround').setup({
+        mappings = {
+          add = '<leader>sa',
+          delete = '<leader>sd',
+          replace = '<leader>sr',
+          find = '',
+          find_left = '',
+          highlight = '',
+          update_n_lines = '',
+          suffix_last = '',
+          suffix_next = '',
+        },
+      })
 
       -- gc: Toggle comment (like 'gcip' - comment inner paragraph)
       -- gcc: Toggle comment on current line
