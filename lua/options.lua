@@ -71,4 +71,10 @@ vim.o.scrolloff = 10
 -- See `:help 'confirm'`
 vim.o.confirm = true
 
+-- Treesitter-based folding. Start fully unfolded (foldlevel=99) so files open expanded.
+vim.o.foldmethod = 'expr'
+vim.o.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+vim.o.foldenable = true
+vim.o.foldlevel = 99
+
 -- vim: ts=2 sts=2 sw=2 et
