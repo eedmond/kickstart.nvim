@@ -77,6 +77,8 @@ return {
               ['<M-BS>'] = function()
                 vim.api.nvim_input '<C-w>'
               end,
+              ['<C-j>'] = require('telescope.actions').move_selection_next,
+              ['<C-k>'] = require('telescope.actions').move_selection_previous,
             },
           },
         },
