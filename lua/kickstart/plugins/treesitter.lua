@@ -12,6 +12,8 @@ return {
         highlight = { enable = true },
         indent = { enable = true },
       }
+      -- zsh has no dedicated treesitter parser; use bash for highlighting and folds.
+      vim.treesitter.language.register('bash', 'zsh')
     end,
   },
   -- There are additional nvim-treesitter modules that you can use to interact

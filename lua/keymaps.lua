@@ -8,6 +8,20 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 -- Marks
 vim.keymap.set('n', '<leader>ml', '<cmd>marks<CR>', { desc = '[M]arks [L]ist' })
 
+-- Toggle markdown checkbox on the current line: [ ] <-> [x]
+vim.keymap.set('n', '<leader>mx', function()
+  local line = vim.api.nvim_get_current_line()
+  local new_line, n = line:gsub('%[[xX]%]', '[ ]', 1)
+  if n == 0 then
+    new_line, n = line:gsub('%[ %]', '[x]', 1)
+  end
+  if n == 0 then
+    vim.notify('No markdown checkbox on this line', vim.log.levels.WARN)
+    return
+  end
+  vim.api.nvim_set_current_line(new_line)
+end, { desc = '[M]arkdown toggle checkbo[x]' })
+
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
@@ -28,14 +42,8 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 -- vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
 -- vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 
--- Keybinds to make split navigation easier.
---  Use CTRL+<hjkl> to switch between windows
---
---  See `:help wincmd` for a list of all window commands
-vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+-- Split navigation between nvim windows AND tmux panes is handled by
+-- vim-tmux-navigator (lua/custom/plugins/tmux-navigator.lua).
 
 -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
 -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
