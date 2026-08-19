@@ -16,9 +16,10 @@ return {
   opts = {
     window = {
       mappings = {
-        -- y: copy just the filename, Y: copy the absolute path
+        -- y: filename, Y: absolute path, C-y: path relative to repo root
         ['y'] = 'copy_filename_to_clipboard',
         ['Y'] = 'copy_path_to_clipboard',
+        ['<C-y>'] = 'copy_relative_path_to_clipboard',
       },
     },
     commands = {
@@ -33,6 +34,21 @@ return {
         local path = node:get_id()
         vim.fn.setreg('+', path)
         vim.notify('Copied path: ' .. path)
+      end,
+      copy_relative_path_to_clipboard = function(state)
+        local node = state.tree:get_node()
+        local path = node:get_id()
+        -- Resolve the git repo root, falling back to cwd if not in a repo
+        local root = vim.fn.systemlist('git -C ' .. vim.fn.fnamemodify(path, ':h') .. ' rev-parse --show-toplevel')[1]
+        if vim.v.shell_error ~= 0 or not root or root == '' then
+          root = vim.fn.getcwd()
+        end
+        local relative = vim.fn.fnamemodify(path, ':.')
+        if path:sub(1, #root) == root then
+          relative = path:sub(#root + 2)
+        end
+        vim.fn.setreg('+', relative)
+        vim.notify('Copied relative path: ' .. relative)
       end,
     },
     filesystem = {
