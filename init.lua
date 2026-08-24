@@ -117,5 +117,8 @@ require 'lazy-plugins'
 require 'custom.plugins.catppuccin'
 vim.cmd.colorscheme 'catppuccin'
 
+-- [[ Ask-agent feature: <leader>a to send file/selection to Claude (see lua/custom/agent.lua) ]]
+require('custom.agent').setup()
+
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
