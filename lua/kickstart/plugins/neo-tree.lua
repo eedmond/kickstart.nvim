@@ -56,17 +56,8 @@ return {
       window = {
         mappings = {
           ['\\'] = 'close_window',
-          ['Y'] = function(state)
-            local node = state.tree:get_node()
-            vim.fn.setreg('+', node.path)
-            vim.notify('Copied file path to clipboard: ' .. node.path)
-          end,
-          ['y'] = function(state)
-            local node = state.tree:get_node()
-            vim.fn.setreg('+', node.name)
-            vim.notify('Copied file name to clipboard: ' .. node.name)
-          end,
-          ['<C-y>'] = 'copy_to_clipboard',
+          -- C-c/C-p are neo-tree's internal copy/paste; C-y stays the repo-relative path (see window.mappings)
+          ['<C-c>'] = 'copy_to_clipboard',
           ['<C-p>'] = 'paste_from_clipboard',
         },
       },
