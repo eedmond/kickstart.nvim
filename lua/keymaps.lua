@@ -8,18 +8,73 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 -- Marks
 vim.keymap.set('n', '<leader>ml', '<cmd>marks<CR>', { desc = '[M]arks [L]ist' })
 
--- Toggle markdown checkbox on the current line: [ ] <-> [x]
-vim.keymap.set('n', '<leader>mx', function()
-  local line = vim.api.nvim_get_current_line()
-  local new_line, n = line:gsub('%[[xX]%]', '[ ]', 1)
-  if n == 0 then
-    new_line, n = line:gsub('%[ %]', '[x]', 1)
+-- Markdown checkboxes: add missing boxes first, then check all, then uncheck all
+local function checkbox_state(line)
+  if line:match '%[[xX]%]' then
+    return 'checked'
+  elseif line:match '%[ %]' then
+    return 'unchecked'
   end
-  if n == 0 then
-    vim.notify('No markdown checkbox on this line', vim.log.levels.WARN)
+end
+
+local function add_checkbox(line)
+  -- Insert the box after an existing list marker, otherwise make the line a list item
+  local indent, marker, rest = line:match '^(%s*)([-*+]%s+)(.*)$'
+  if not marker then
+    indent, marker, rest = line:match '^(%s*)(%d+[.)]%s+)(.*)$'
+  end
+  if marker then
+    return indent .. marker .. '[ ] ' .. rest
+  end
+  local text
+  indent, text = line:match '^(%s*)(.*)$'
+  return indent .. '- [ ] ' .. text
+end
+
+local function toggle_checkboxes(first, last)
+  local lines = vim.api.nvim_buf_get_lines(0, first - 1, last, false)
+  local targets, missing, any_unchecked = {}, false, false
+  for i, line in ipairs(lines) do
+    if line:match '%S' then
+      table.insert(targets, i)
+      local state = checkbox_state(line)
+      if not state then
+        missing = true
+      elseif state == 'unchecked' then
+        any_unchecked = true
+      end
+    end
+  end
+  if #targets == 0 then
     return
   end
-  vim.api.nvim_set_current_line(new_line)
+
+  for _, i in ipairs(targets) do
+    if missing then
+      if not checkbox_state(lines[i]) then
+        lines[i] = add_checkbox(lines[i])
+      end
+    elseif any_unchecked then
+      lines[i] = lines[i]:gsub('%[ %]', '[x]', 1)
+    else
+      lines[i] = lines[i]:gsub('%[[xX]%]', '[ ]', 1)
+    end
+  end
+  vim.api.nvim_buf_set_lines(0, first - 1, last, false, lines)
+end
+
+vim.keymap.set('n', '<leader>mx', function()
+  local lnum = vim.fn.line '.'
+  toggle_checkboxes(lnum, lnum)
+end, { desc = '[M]arkdown toggle checkbo[x]' })
+
+vim.keymap.set('x', '<leader>mx', function()
+  local first, last = vim.fn.line 'v', vim.fn.line '.'
+  if first > last then
+    first, last = last, first
+  end
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Esc>', true, false, true), 'n', false)
+  toggle_checkboxes(first, last)
 end, { desc = '[M]arkdown toggle checkbo[x]' })
 
 -- Diagnostic keymaps
