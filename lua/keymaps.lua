@@ -8,7 +8,77 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 -- Marks
 vim.keymap.set('n', '<leader>ml', '<cmd>marks<CR>', { desc = '[M]arks [L]ist' })
 
--- Markdown checkboxes: add missing boxes first, then check all, then uncheck all
+-- [[ Lists ]]
+-- Strips a leading bullet (-, *, +) or ordered marker (1., a., iv.) from text
+local function strip_marker(text)
+  for _, pattern in ipairs { '^[-*+]%s+', '^%d+[.)]%s+', '^%l[.)]%s+', '^[ivxlcdm]+[.)]%s+' } do
+    local stripped, n = text:gsub(pattern, '', 1)
+    if n > 0 then
+      return stripped
+    end
+  end
+  return text
+end
+
+local function to_alpha(n)
+  local s = ''
+  while n > 0 do
+    n = n - 1
+    s = string.char(97 + n % 26) .. s
+    n = math.floor(n / 26)
+  end
+  return s
+end
+
+local function to_roman(n)
+  local numerals = { { 1000, 'm' }, { 900, 'cm' }, { 500, 'd' }, { 400, 'cd' }, { 100, 'c' }, { 90, 'xc' }, { 50, 'l' }, { 40, 'xl' }, { 10, 'x' }, { 9, 'ix' }, { 5, 'v' }, { 4, 'iv' }, { 1, 'i' } }
+  local s = ''
+  for _, pair in ipairs(numerals) do
+    while n >= pair[1] do
+      s = s .. pair[2]
+      n = n - pair[1]
+    end
+  end
+  return s
+end
+
+-- Nesting levels cycle 1. -> a. -> i. -> 1. ...
+local function ordered_marker(level, count)
+  local style = (level - 1) % 3
+  if style == 0 then
+    return count .. '. '
+  elseif style == 1 then
+    return to_alpha(count) .. '. '
+  end
+  return to_roman(count) .. '. '
+end
+
+-- Rewrites non-blank lines with make_marker(level, count); if nothing would change, strips markers instead
+local function toggle_list(first, last, make_marker)
+  local lines = vim.api.nvim_buf_get_lines(0, first - 1, last, false)
+  local new, stripped, stack = {}, {}, {}
+  for i, line in ipairs(lines) do
+    new[i], stripped[i] = line, line
+    if line:match '%S' then
+      local indent, rest = line:match '^(%s*)(.*)$'
+      local width = #indent
+      -- Stack of { indent, count } tracks the counter for each nesting level
+      while #stack > 0 and stack[#stack].indent > width do
+        table.remove(stack)
+      end
+      if #stack == 0 or stack[#stack].indent < width then
+        table.insert(stack, { indent = width, count = 0 })
+      end
+      stack[#stack].count = stack[#stack].count + 1
+      rest = strip_marker(rest)
+      new[i] = indent .. make_marker(#stack, stack[#stack].count) .. rest
+      stripped[i] = indent .. rest
+    end
+  end
+  vim.api.nvim_buf_set_lines(0, first - 1, last, false, vim.deep_equal(new, lines) and stripped or new)
+end
+
+-- Checkboxes: add missing boxes first, then check all, then uncheck all
 local function checkbox_state(line)
   if line:match '%[[xX]%]' then
     return 'checked'
@@ -18,17 +88,14 @@ local function checkbox_state(line)
 end
 
 local function add_checkbox(line)
-  -- Insert the box after an existing list marker, otherwise make the line a list item
-  local indent, marker, rest = line:match '^(%s*)([-*+]%s+)(.*)$'
-  if not marker then
-    indent, marker, rest = line:match '^(%s*)(%d+[.)]%s+)(.*)$'
+  -- Insert the box after an existing list marker, otherwise make the line a bullet item
+  local indent, rest = line:match '^(%s*)(.*)$'
+  local text = strip_marker(rest)
+  local marker = rest:sub(1, #rest - #text)
+  if marker == '' then
+    marker = '* '
   end
-  if marker then
-    return indent .. marker .. '[ ] ' .. rest
-  end
-  local text
-  indent, text = line:match '^(%s*)(.*)$'
-  return indent .. '- [ ] ' .. text
+  return indent .. marker .. '[ ] ' .. text
 end
 
 local function toggle_checkboxes(first, last)
@@ -63,19 +130,31 @@ local function toggle_checkboxes(first, last)
   vim.api.nvim_buf_set_lines(0, first - 1, last, false, lines)
 end
 
-vim.keymap.set('n', '<leader>mx', function()
-  local lnum = vim.fn.line '.'
-  toggle_checkboxes(lnum, lnum)
-end, { desc = '[M]arkdown toggle checkbo[x]' })
+-- Maps lhs in normal mode (current line) and visual mode (selected lines) to fn(first, last)
+local function map_lines(lhs, fn, desc)
+  vim.keymap.set('n', lhs, function()
+    local lnum = vim.fn.line '.'
+    fn(lnum, lnum)
+  end, { desc = desc })
+  vim.keymap.set('x', lhs, function()
+    local first, last = vim.fn.line 'v', vim.fn.line '.'
+    if first > last then
+      first, last = last, first
+    end
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Esc>', true, false, true), 'n', false)
+    fn(first, last)
+  end, { desc = desc })
+end
 
-vim.keymap.set('x', '<leader>mx', function()
-  local first, last = vim.fn.line 'v', vim.fn.line '.'
-  if first > last then
-    first, last = last, first
-  end
-  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Esc>', true, false, true), 'n', false)
-  toggle_checkboxes(first, last)
-end, { desc = '[M]arkdown toggle checkbo[x]' })
+map_lines('<leader>ln', function(first, last)
+  toggle_list(first, last, ordered_marker)
+end, '[L]ist [N]umbered')
+map_lines('<leader>lb', function(first, last)
+  toggle_list(first, last, function()
+    return '* '
+  end)
+end, '[L]ist [B]ullets')
+map_lines('<leader>lc', toggle_checkboxes, '[L]ist [C]heckbox')
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
