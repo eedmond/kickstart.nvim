@@ -78,16 +78,13 @@ local function toggle_list(first, last, make_marker)
   vim.api.nvim_buf_set_lines(0, first - 1, last, false, vim.deep_equal(new, lines) and stripped or new)
 end
 
--- Checkboxes: add missing boxes first, then check all, then uncheck all
+-- Checkboxes: set all to the mark (optionally adding empty boxes first), then uncheck all
 local function checkbox_state(line)
-  if line:match '%[[xX]%]' then
-    return 'checked'
-  elseif line:match '%[ %]' then
-    return 'unchecked'
-  end
+  local mark = line:match '%[([ xX%-])%]'
+  return mark and mark:lower()
 end
 
-local function add_checkbox(line)
+local function add_checkbox(line, mark)
   -- Insert the box after an existing list marker, otherwise make the line a bullet item
   local indent, rest = line:match '^(%s*)(.*)$'
   local text = strip_marker(rest)
@@ -95,20 +92,20 @@ local function add_checkbox(line)
   if marker == '' then
     marker = '* '
   end
-  return indent .. marker .. '[ ] ' .. text
+  return indent .. marker .. '[' .. mark .. '] ' .. text
 end
 
-local function toggle_checkboxes(first, last)
+local function toggle_checkboxes(first, last, mark, add_empty)
   local lines = vim.api.nvim_buf_get_lines(0, first - 1, last, false)
-  local targets, missing, any_unchecked = {}, false, false
+  local targets, missing, any_unmarked = {}, false, false
   for i, line in ipairs(lines) do
     if line:match '%S' then
       table.insert(targets, i)
       local state = checkbox_state(line)
       if not state then
         missing = true
-      elseif state == 'unchecked' then
-        any_unchecked = true
+      elseif state ~= mark then
+        any_unmarked = true
       end
     end
   end
@@ -117,14 +114,10 @@ local function toggle_checkboxes(first, last)
   end
 
   for _, i in ipairs(targets) do
-    if missing then
-      if not checkbox_state(lines[i]) then
-        lines[i] = add_checkbox(lines[i])
-      end
-    elseif any_unchecked then
-      lines[i] = lines[i]:gsub('%[ %]', '[x]', 1)
-    else
-      lines[i] = lines[i]:gsub('%[[xX]%]', '[ ]', 1)
+    if not checkbox_state(lines[i]) then
+      lines[i] = add_checkbox(lines[i], add_empty and ' ' or mark)
+    elseif not (missing and add_empty) then
+      lines[i] = lines[i]:gsub('%[[ xX%-]%]', (missing or any_unmarked) and '[' .. mark .. ']' or '[ ]', 1)
     end
   end
   vim.api.nvim_buf_set_lines(0, first - 1, last, false, lines)
@@ -154,7 +147,12 @@ map_lines('<leader>lb', function(first, last)
     return '* '
   end)
 end, '[L]ist [B]ullets')
-map_lines('<leader>lc', toggle_checkboxes, '[L]ist [C]heckbox')
+map_lines('<leader>lc', function(first, last)
+  toggle_checkboxes(first, last, 'x', true)
+end, '[L]ist [C]heckbox')
+map_lines('<leader>lw', function(first, last)
+  toggle_checkboxes(first, last, '-')
+end, '[L]ist [W]ork in progress')
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
