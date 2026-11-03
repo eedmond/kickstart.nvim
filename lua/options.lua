@@ -77,4 +77,7 @@ vim.o.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
 vim.o.foldenable = true
 vim.o.foldlevel = 99
 
+-- Never block on a "Press ENTER" prompt; a stuck prompt lets scheduled callbacks pile up and leak memory.
+vim.o.messagesopt = 'wait:2000,history:500'
+
 -- vim: ts=2 sts=2 sw=2 et
